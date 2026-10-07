@@ -1,75 +1,107 @@
-<!-- Powered by kleeja -->
-<div id="content_index">
+<div id="content_index" class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
 
-	<!-- welcome -->
-	<UNLESS NAME="is_embedded">
-	<div class="jumbotron">
-		<h5><span class="glyphicon glyphicon-heart" aria-hidden="true"></span>  {lang.WELCOME} <IF NAME="user_is">[ {username} ]</IF></h5>
-		<p>{welcome_msg}</p>
-	</div>
-	</UNLESS>
-
-	<!-- messages: error or info -->
-		<div class="card mb-5">
-			<ul class="list-group list-group-flush" id="messages">
-				<LOOP NAME="info">
-					<IF LOOP="message_type == info">
-						<li class="list-group-item">
-							{{message_content}}
-						</li>
-					<ELSE>
-						<!-- error -->
-						<li class="list-group-item  list-group-item-danger">
-							<strong>{lang.INFORMATION}</strong> : {{message_content}}
-						</li>
-					</IF>
-				</LOOP>
-			</ul>
-		</div>
+        <UNLESS NAME="is_embedded">
+        <!-- welcome -->
+        <div class="text-center mb-4 mb-lg-5">
+            <h1 class="display-5 fw-bold mb-3">{lang.WELCOME}<IF NAME="user_is"> <span class="text-primary">{username}</span></IF></h1>
+            <div class="lead text-body-secondary welcome-msg col-lg-10 mx-auto">{welcome_msg}</div>
+        </div>
+        </UNLESS>
 
 
-
-	<!-- box loading -->
-
-
-
-	<div id="zone" class="fd-zone">
-		<div id="loadbox" class="card">
-			<div class="card-body">
-				{lang.WAIT_LOADING} <span id="progress_data"></span>
-				<br>
-				<img src="{STYLE_PATH}images/loading.gif" alt="{lang.LOADING}" />
-			</div>
-		</div>
-
-		<p class="img"></p>
-		<p><h3><span>{lang.DRAG_AND_DROP}</span></h3></p>
-		<p><span>{lang.OR_MANUAL_SELECT}</span></p>
-
-	</div>
-
-	<div class="fallabackZone">
-		<input type="file" name="file" class="fd-file" id="fallbackFile" />
-	</div>
+        <!-- messages: upload results or errors, js/dragdrop.js adds the results of each drop here -->
+        <div id="upload-messages" class="upload-messages" aria-live="polite">
+            <LOOP NAME="info">
+                <IF LOOP="message_type == info">
+                <div class="card upload-result border-success-subtle shadow-sm mb-3">
+                    <div class="card-body p-4">{{message_content}}</div>
+                </div>
+                <ELSE>
+                <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                    <div>{{message_content}}</div>
+                </div>
+                </IF>
+            </LOOP>
+        </div>
 
 
-	<IF NAME="show_online">
-		<!-- who's onLine -->
-		<div class="card who-online">
-			<div class="card-header">
-				{lang.NUMBER_ONLINE}: <b>{current_online_users}</b>
-			</div>
+        <!-- upload box: drop files on the zone, or click it to choose them -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-body d-flex align-items-center justify-content-between gap-3 py-3 px-4">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="icon-box rounded-3 bg-primary-subtle text-primary-emphasis"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                    <h2 class="h5 fw-semibold mb-0">{lang.DOWNLOAD_F}</h2>
+                </div>
+                <a href="{config.siteurl}(config.mod_writer?guide.html:go.php?go=guide)" class="small link-secondary text-decoration-none text-nowrap">
+                    <i class="fa-regular fa-circle-question me-1"></i>{lang.GUIDE}
+                </a>
+            </div>
 
-			<IF NAME="show_names">
-				<div class="card-body">
-				<LOOP NAME="show_names">
-					<span class="badge badge-pill badge-default">{{name}}</span>
-				</LOOP>
-				</div>
-			</IF>
-		</div>
-	</IF>
+            <div class="card-body p-4">
+
+                <div id="upload-errors" class="alert alert-danger small d-none" role="alert"></div>
+
+                <div id="dropzone" class="drop-zone" role="button" tabindex="0" data-action="{action}">
+                    <div class="drop-zone-idle">
+                        <span class="icon-box icon-box-lg rounded-circle bg-primary-subtle text-primary-emphasis mb-3"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                        <p class="h4 fw-semibold mb-2">{lang.DRAG_AND_DROP}</p>
+                        <p class="text-body-secondary mb-0">{lang.OR_MANUAL_SELECT}</p>
+                    </div>
+
+                    <!-- shown while the files are uploading -->
+                    <div class="drop-zone-progress d-none">
+                        <div class="spinner-border text-primary mb-3" aria-hidden="true"></div>
+                        <p class="fw-semibold mb-3" role="status">{lang.WAIT_LOADING}</p>
+                        <div class="progress" role="progressbar" aria-label="{lang.WAIT_LOADING}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">0%</div>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="dropzone-file" class="d-none">
+
+                <IF NAME="config.safe_code">
+                <!-- verification code, sent with the files of each drop -->
+                <div class="mt-4">
+                    <label for="kleeja_code_answer" class="form-label">{lang.VERTY_CODE}</label>
+                    <div class="input-group">
+                        <span class="input-group-text p-0 overflow-hidden"><img id="kleeja_img_captcha" class="captcha-img" src="{captcha_file_path}" data-captcha-url="{captcha_file_path}" width="160" height="38" alt="{lang.REFRESH_CAPTCHA}" title="{lang.REFRESH_CAPTCHA}" onclick="update_kleeja_captcha('{captcha_file_path}', 'kleeja_code_answer');"></span>
+                        <input type="text" name="kleeja_code_answer" id="kleeja_code_answer" class="form-control" dir="ltr" autocomplete="off" aria-describedby="kleeja_code_answer_help">
+                        <button type="button" class="btn btn-outline-secondary" title="{lang.REFRESH_CAPTCHA}" aria-label="{lang.REFRESH_CAPTCHA}" onclick="update_kleeja_captcha('{captcha_file_path}', 'kleeja_code_answer');"><i class="fa-solid fa-arrow-rotate-right"></i></button>
+                    </div>
+                    <div id="kleeja_code_answer_help" class="form-text">{lang.NOTE_CODE}</div>
+                </div>
+                </IF>
+            </div>
+
+            <div class="card-footer bg-body-tertiary py-3 px-4">
+                <small class="agree text-body-secondary">{terms_msg}</small>
+            </div>
+        </div>
+
+        <script>
+            var UPLOAD_ALLOWED_EXTS = {js_allowed_extensions_types};
+            var UPLOAD_ALLOWED_SIZES = {js_allowed_extensions_sizes};
+            var UPLOAD_MAX_FILES = parseInt('{config.filesnum}', 10) || 1;
+        </script>
 
 
+        <IF NAME="show_online">
+        <!-- who's online -->
+        <div class="card who-online shadow-sm mt-4">
+            <div class="card-body d-flex flex-wrap align-items-center gap-2">
+                <span class="small text-body-secondary me-1">
+                    <span class="d-inline-block bg-success rounded-circle p-1 me-1" aria-hidden="true"></span>{lang.NUMBER_ONLINE}: <strong class="text-body">{current_online_users}</strong>
+                </span>
+                <IF NAME="show_names">
+                    <LOOP NAME="show_names">
+                    <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis fw-medium">{{name}}</span>
+                    </LOOP>
+                </IF>
+            </div>
+        </div>
+        </IF>
 
+    </div>
 </div>

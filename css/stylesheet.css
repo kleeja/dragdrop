@@ -1,0 +1,90 @@
+/**
+ * Kleeja dragdrop style
+ * Loaded after the stylesheet of the bootstrap style, it only adds the drop zone of index_body.html.
+ * The colors are Bootstrap variables, so the zone follows the light and dark modes.
+ */
+
+/* index_body.html: drop files on it, or click it (Enter or Space with the keyboard) to choose them */
+.drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 16rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    background-color: var(--bs-tertiary-bg);
+    border: 2px dashed var(--bs-border-color);
+    border-radius: var(--bs-border-radius-xl);
+    transition:
+        border-color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+}
+
+.drop-zone:hover {
+    border-color: var(--bs-primary);
+}
+
+.drop-zone:focus-visible {
+    border-color: var(--bs-primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+/* "Select" in the hint of OR_MANUAL_SELECT reads as a link */
+.drop-zone em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--bs-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+/* files dragged over the zone */
+.drop-zone.is-dragover {
+    background-color: var(--bs-primary-bg-subtle);
+    border-style: solid;
+    border-color: var(--bs-primary);
+}
+
+.drop-zone.is-dragover .drop-zone-idle {
+    pointer-events: none;
+}
+
+/* the icon circle has the subtle primary background too, it would vanish in the zone, !important beats the utility class */
+.drop-zone.is-dragover .icon-box {
+    background-color: var(--bs-body-bg) !important;
+    transform: translateY(-0.25rem);
+}
+
+.drop-zone .icon-box {
+    transition: transform 0.15s ease-in-out;
+}
+
+/* while the files of a drop are uploading the zone takes no other file */
+.drop-zone.is-uploading {
+    cursor: progress;
+    border-style: solid;
+}
+
+.drop-zone-progress {
+    width: 100%;
+    max-width: 24rem;
+}
+
+.drop-zone-progress .progress {
+    height: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .drop-zone,
+    .drop-zone .icon-box {
+        transition: none;
+    }
+
+    .drop-zone.is-dragover .icon-box {
+        transform: none;
+    }
+}

@@ -1,113 +1,134 @@
-
 <!DOCTYPE html>
-<html lang="{lang.LANG_SMALL_NAME}" dir="{dir}">
+<html lang="{lang.LANG_SMALL_NAME}" dir="{dir}" data-bs-theme="light">
 <head>
-	<meta charset="{charset}">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="Kleeja.com">
+    <meta charset="{charset}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Kleeja.net">
 
-	<title>{title}(title? - :){config.sitename}</title>
+    <title>{title}(title? - :){config.sitename}</title>
 
-	<link rel="shortcut icon" href="images/favicon.ico" />
-	<link rel="icon" type="image/gif" href="images/favicon.gif" />
-	<link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
-	<link rel="apple-touch-startup-image" href="images/iPhone.png" />
+    <!-- sets the light or dark theme before the page is painted -->
+    <script src="{STYLE_PATH}js/color-mode.js"></script>
 
+    <link rel="icon" type="image/png" href="{config.siteurl}images/favicon.png">
+    <link rel="shortcut icon" href="{config.siteurl}images/favicon.ico">
+    <link rel="apple-touch-icon" href="{config.siteurl}images/apple-touch-icon.png">
 
-	<!-- Bootstrap core CSS -->
-	<link href="{STYLE_PATH}css/bootstrap.min.css" rel="stylesheet">
-	<link href="{STYLE_PATH}css/stylesheet.css" rel="stylesheet">
+    <IF NAME="lang.DIR==rtl">
+    <link rel="stylesheet" href="{config.siteurl}includes/static_shared_files/bootstrap/css/bootstrap.rtl.min.css">
+    <ELSE>
+    <link rel="stylesheet" href="{config.siteurl}includes/static_shared_files/bootstrap/css/bootstrap.min.css">
+    </IF>
+    <link rel="stylesheet" href="{config.siteurl}includes/static_shared_files/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="{STYLE_PATH}css/stylesheet.css">
+    <!-- the drop zone, over the bootstrap style this one depends on -->
+    <link rel="stylesheet" href="{THIS_STYLE_PATH}css/stylesheet.css">
 
-	<link href="{THIS_STYLE_PATH}css/basic.css" rel="stylesheet">
-
-
-	<IF NAME="lang.DIR==rtl">
-		<style type="text/css">
-			body{font-family: "Tahoma",Arial,sans-serif;}
-			body{
-				direction: rtl; /* placing it here fixes the issue with jquery white page bug */
-			}
-		</style>
-		<link rel="stylesheet" type="text/css" media="all" href="{STYLE_PATH}css/bootstrap.rtl.min.css" />
-	</IF>
-
-
-
-	<script type="text/javascript">
-        <!--
+    <script>
         var LANG_PAST_URL_HERE = "{lang.PAST_URL_HERE}";
         var LANG_MORE_F_FILES = "{lang.MORE_F_FILES}";
-        var STYLE_PATH  = "{STYLE_PATH}";
-        -->
-	</script>
+        var STYLE_PATH = "{STYLE_PATH}";
+    </script>
 
-
-
-	<!-- Extra code -->
-	{EXTRA_CODE_META}
+    <!-- Extra code -->
+    {EXTRA_CODE_META}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
+<header class="sticky-top">
+    <nav class="navbar navbar-expand-xl navbar-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="{config.siteurl}">
+                <img src="{config.siteurl}images/logo-light.svg" alt="" width="32" height="32" aria-hidden="true">
+                <span>{config.sitename}</span>
+            </a>
 
-	<!-- header -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-primary navbar-inverse">
-		<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#TopMenuNavbar" aria-controls="TopMenuNavbar" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
+            <!-- ?embedded=1 shows the uploader without the menus, for an iframe on another page -->
+            <UNLESS NAME="is_embedded">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="{lang.MENU}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-		<a class="navbar-brand" href="{config.siteurl}">
-			<img src="{STYLE_PATH}images/logo.png" width="30" height="30" class="d-inline-block align-top" alt="{username}">
-			{config.sitename}
-		</a>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <!-- main menu -->
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+                    <LOOP NAME="top_menu">
+                        <IF LOOP="show">
+                        <li class="nav-item"><a href="{{url}}" class="nav-link(go_current=={{name}}? active:)">{{title}}</a></li>
+                        </IF>
+                    </LOOP>
+                </ul>
 
-		<UNLESS NAME="is_embedded">
-		<div class="collapse navbar-collapse" id="TopMenuNavbar">
-			<ul class="navbar-nav mr-auto">
-				<LOOP NAME="top_menu">
-					<IF LOOP="show">
-						<li class="nav-item"><a href="{{url}}" class="nav-link(go_current=={{name}}? active:)">{{title}}</a></li>
-					</IF>
-				</LOOP>
-			</ul>
-		</div>
-		</UNLESS>
-	</nav>
+                <ul class="navbar-nav align-items-xl-center">
+                    <!-- color mode -->
+                    <li class="nav-item dropdown">
+                        <button type="button" class="nav-link dropdown-toggle d-flex align-items-center gap-2" id="colorModeToggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{lang.COLOR_MODE}">
+                            <i class="fa-solid fa-circle-half-stroke fa-fw" data-color-mode-icon></i>
+                            <span class="d-xl-none">{lang.COLOR_MODE}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="colorModeToggle">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-color-mode-value="light" aria-pressed="false">
+                                    <i class="fa-solid fa-sun fa-fw me-2 opacity-50"></i>{lang.COLOR_LIGHT}
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-color-mode-value="dark" aria-pressed="false">
+                                    <i class="fa-solid fa-moon fa-fw me-2 opacity-50"></i>{lang.COLOR_DARK}
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center" data-color-mode-value="auto" aria-pressed="false">
+                                    <i class="fa-solid fa-circle-half-stroke fa-fw me-2 opacity-50"></i>{lang.COLOR_AUTO}
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
 
+                    <!-- user menu -->
+                    <IF NAME="user_is">
+                    <li class="nav-item dropdown">
+                        <button type="button" class="nav-link dropdown-toggle d-flex align-items-center gap-2" id="userMenuToggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-circle-user fs-5"></i>
+                            <span>{username}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userMenuToggle">
+                            <LOOP NAME="side_menu">
+                                <IF LOOP="show">
+                                <IF LOOP="name==logout"><li><hr class="dropdown-divider"></li></IF>
+                                <li>
+                                    <a href="{{url}}" class="dropdown-item d-flex align-items-center(go_current=={{name}}? active:)">
+                                        <i class="fa-solid fa-{{icon}} fa-fw me-2 opacity-50" aria-hidden="true"></i>{{title}}
+                                    </a>
+                                </li>
+                                </IF>
+                            </LOOP>
+                        </ul>
+                    </li>
+                    <ELSE>
+                    <LOOP NAME="side_menu">
+                        <IF LOOP="show">
+                        <IF LOOP="name==register">
+                        <li class="nav-item ms-xl-2 my-2 my-xl-0"><a href="{{url}}" class="btn btn-light px-3 fw-semibold text-primary">{{title}}</a></li>
+                        <ELSE>
+                        <li class="nav-item"><a href="{{url}}" class="nav-link(go_current=={{name}}? active:)">{{title}}</a></li>
+                        </IF>
+                        </IF>
+                    </LOOP>
+                    </IF>
+                </ul>
+            </div>
+            </UNLESS>
+        </div>
+    </nav>
+</header>
 
-	<!-- use related menu -->
-	<UNLESS NAME="is_embedded">
-	<nav class="navbar navbar-expand-lg bg-light navbar-light">
-		<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<span class="navbar-brand">
-			<img src="{STYLE_PATH}images/user.png" width="26" height="26" class="d-inline-block align-top" alt="{username}">
-		</span>
+<main id="main-content" class="flex-grow-1 py-4 py-lg-5">
+    <div class="container">
 
-		<div class="collapse navbar-collapse" id="navbarText">
-			<ul class="navbar-nav mr-auto">
-				<LOOP NAME="side_menu">
-					<IF LOOP="show">
-						<li class="nav-item"><a href="{{url}}" class="nav-link(go_current=={{name}}? active:)">{{title}}</a></li>
-					</IF>
-				</LOOP>
-			</ul>
-			<IF NAME="user_is">
-			<span class="navbar-text">
-			   {username}
-			</span>
-			</IF>
-		</div>
-	</nav>
-	</UNLESS>
-
-
-	<div class="container mt-4">
-
-	<UNLESS NAME="is_embedded">
-	<IF NAME="extras.header">
-		<div class="extras_header mb-5">{extras.header}</div>
-	</IF>
-	</UNLESS>
-
+    <UNLESS NAME="is_embedded">
+    <IF NAME="extras.header">
+        <div class="extras_header mb-4">{extras.header}</div>
+    </IF>
+    </UNLESS>
 
